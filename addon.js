@@ -22,6 +22,26 @@ gcli.addCommand({
   // nl-nl: Beheer add-ons
   description: "Manipulate add-ons",
 });
+// The type parameter, used in "addon list".
+const typeParameter = {
+  name: "type",
+  type: "string",
+  description: "The type of the add-on, could be <code>dictionary</code>, <code>extension</code>, <code>locale</code>, <code>plugin</code> or <code>theme</code>",
+  defaultValue: "default"
+};
+/**
+ * Returns whether the passed value equals either "dictionary", "extension", "locale", "plugin" or "theme".
+ */
+function determineIsValidType(value) {
+  // I guess extensions and plugins will be most frequently used.
+  return "extension" == value || "plugin" == value || "dictionary" == value || "locale" == value || "theme" == value;
+}
+/**
+ * Returns the pluralised form of the add-on type.
+ */
+function getTypePlural(value) {
+  return "dictionary" == value ? "dictionaries" : (value + "s");
+}
 (function() {
   function representEnabledAddon(addon) {
     return "<li><![CDATA[" + addon.name + "\u2002" + addon.version + "]]></li>";
@@ -37,9 +57,10 @@ gcli.addCommand({
   }
   /**
    * Resolves the promise which is the scope (this) of this function, filling it with an HTML representation of the passed
-   * add-ons.
+   * add-ons. The passed type describes the type of the add-ons in the passed list. If null is passed as a type, the type is
+   * "extension", but the user has not explicitly defined this type.
    */
-  function list(addons) {
+  function list(type, addons) {
     // Separate the enabled add-ons from the disabled ones.
     let enabledAddons = [];
     let disabledAddons = [];
@@ -47,25 +68,33 @@ gcli.addCommand({
       (addon.userDisabled ? disabledAddons : enabledAddons).push(addon);
     });
     // Map and sort the add-ons, and create an HTML list.
-    // nl-nl: Deze add-ons zijn op dit moment geinstalleerd:
-    this.resolve("The following add-ons are currently installed:" +
+    // nl-nl: Deze {$1} zijn op dit moment geinstalleerd:
+    this.resolve("The following " + getTypePlural(null == type ? "extension" : type) + " are currently installed:" +
       "<ol>" +
       enabledAddons.sort(compareAddonNames).map(representEnabledAddon).join("") +
       disabledAddons.sort(compareAddonNames).map(representDisabledAddon).join("") +
-      "</ol>");
+      "</ol>" +
+    // nl-nl: Om andere type add-ons te zien geef je een type parameter op, zoals dit {$1}.
+      ((null == type) ? "To see the other add-ons, provide the type parameter like so <code>addon list plugin</code>." : ""));
   }
   // Add "addon list".
   gcli.addCommand({
     name: "addon list",
     // nl-nl: Toon een lijst van geinstalleerde add-ons
     description: "List the installed add-ons",
+    params: [typeParameter],
     exec: function(cliArguments, context) {
       // Create the promise that will be resolved when the add-on listing has been finished.
       let promise = context.createPromise();
-      // Get the add-ons. TODO This command lists extensions only, though it looks like "addon install" could also install
-      // other types of add-ons. If so, these commands should be more consistent. Also, the name of the parent command -
-      // "addon" - might not be completely accurate.
-      AddonManager.getAddonsByTypes(["extension"], list.bind(promise));
+      // Get the add-ons. If no type was provided, get the extensions.
+      if (cliArguments[typeParameter.name] == typeParameter.defaultValue) {
+        AddonManager.getAddonsByTypes(["extension"], list.bind(promise, null));
+      } else if (determineIsValidType(cliArguments[typeParameter.name])) {
+        AddonManager.getAddonsByTypes([cliArguments[typeParameter.name]], list.bind(promise, cliArguments[typeParameter.name]));
+      } else {
+        // nl-nl: Onbekend type {$1}. Misschien bedoelde je {$2}.
+        return "Unknown type \"<![CDATA[" + cliArguments[typeParameter.name] + "]]>\". Perhaps you meant <code>addon list extension</code>.";
+      }
       return promise;
     }
   });
