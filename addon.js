@@ -19,10 +19,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "AddonRepository", "resource://gre/modul
 // Add the "parent" command.
 gcli.addCommand({
   name: "addon",
-  description: {
-    "root": "Manipulate add-ons",
-    "nl-nl": "Beheer add-ons"
-  }
+  // nl-nl: Beheer add-ons
+  description: "Manipulate add-ons",
 });
 (function() {
   function representEnabledAddon(addon) {
@@ -59,10 +57,8 @@ gcli.addCommand({
   // Add "addon list".
   gcli.addCommand({
     name: "addon list",
-    description: {
-      "root": "List the installed add-ons",
-      "nl-nl": "Toon een lijst van geinstalleerde add-ons"
-    },
+    // nl-nl: Toon een lijst van geinstalleerde add-ons
+    description: "List the installed add-ons",
     exec: function(cliArguments, context) {
       // Create the promise that will be resolved when the add-on listing has been finished.
       let promise = context.createPromise();
@@ -78,10 +74,8 @@ gcli.addCommand({
 const nameParameter = {
   name: "name",
   type: "string",
-  description: {
-    "root": "The name of the add-on",
-    "nl-nl": "De naam van de add-on"
-  }
+  // nl-nl: De naam van de add-on
+  description: "The name of the add-on"
 };
 /**
  * Returns all of the latin characters in the passed string in one long string, converted to lower case.
@@ -150,10 +144,8 @@ function representAddon(addon) {
   // Add "addon enable".
   gcli.addCommand({
     name: "addon enable",
-    description: {
-      "root": "Enable the specified add-on",
-      "nl-nl": "Schakel de gespecificeerde add-on in"
-    },
+    // nl-nl: Schakel de gespecificeerde add-on in
+    description: "Enable the specified add-on",
     params: [nameParameter],
     exec: function(cliArguments, context) {
       // Create the promise that will be resolved when the enabling has been finished.
@@ -190,10 +182,8 @@ function representAddon(addon) {
   // Add "addon disable".
   gcli.addCommand({
     name: "addon disable",
-    description: {
-      "root": "Disable the specified add-on",
-      "nl-nl": "Schakel de gespecificeerde add-on uit"
-    },
+    // nl-nl: Schakel de gespecificeerde add-on uit
+    description: "Disable the specified add-on",
     params: [nameParameter],
     exec: function(cliArguments, context) {
       // Create the promise that will be resolved when the disabling has been finished.
@@ -352,18 +342,14 @@ function representAddon(addon) {
   const forceParameter = {
     name: "force",
     type: "boolean",
-    description: {
-      "root": "Whether an add-on search currently in progress, if existent, should be cancelled.",
-      "nl-nl": "Of een zoekopdracht naar add-ons die op dit moment bezig is geannuleerd moet worden, mits deze bestaat."
-    },
+    // nl-nl: Of een zoekopdracht naar add-ons die op dit moment bezig is geannuleerd moet worden, mits deze bestaat
+    description: "Whether an add-on search currently in progress, if existent, should be cancelled",
     defaultValue: false
   }
   gcli.addCommand({
     name: "addon install",
-    description: {
-      "root": "Install the specified add-on from addons.mozilla.org",
-      "nl-nl": "Installeer de gespecificeerde add-on vanaf addons.mozilla.org"
-    },
+    // nl-nl: Installeer de gespecificeerde add-on vanaf addons.mozilla.org
+    description: "Install the specified add-on from addons.mozilla.org",
     params: [nameParameter, forceParameter],
     exec: function(cliArguments, context) {
       // Check whether an add-on search is currently in progress.
@@ -417,10 +403,8 @@ function representAddon(addon) {
   // Add "addon uninstall".
   gcli.addCommand({
     name: "addon uninstall",
-    description: {
-      "root": "Uninstall the specified add-on",
-      "nl-nl": "Deinstalleer de gespecificeerde add-on"
-    },
+    // nl-nl: Deinstalleer de gespecificeerde add-on
+    description: "Uninstall the specified add-on",
     params: [nameParameter],
     exec: function(cliArguments, context) {
       // Create the promise that will be resolved when the uninstalling has been finished.
